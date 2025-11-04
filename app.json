@@ -1,41 +1,25 @@
 {
-  "expo": {
-    "name": "app",
-    "slug": "app",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "app",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "name": "Caribu Loterias",
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      "expo-font"
-    ],
-    "experiments": {
-      "typedRoutes": true
+  "name": "Cognos",
+  "slug": "cognos",
+  "version": "1.0.0",
+  "icon": "./src/assets/images/icone_app.png",
+  "jsEngine": "hermes",
+  "platforms": [
+    "ios",
+    "android",
+    "web"
+  ],
+  "orientation": "portrait",
+  "ios": {
+    "bundleIdentifier": "com.mentuca.mentucaapp"
+  },
+  "android": {
+    "package": "com.mentuca.mentucaapp"
+  },
+  "extra": {
+    "eas": {
+      "projectId": "a61fd148-175e-4dd3-a176-fc2edd456952"
     }
-  }
+  },
+  "owner": "bernardo1022"
 }
