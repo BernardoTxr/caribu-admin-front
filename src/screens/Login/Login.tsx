@@ -164,9 +164,7 @@ const Login = () => {
                 }
                 
                 console.log('Redirecionando para página principal...');
-                // **MUDANÇA PARA STACK:** Substitui router.replace('/') por navigation.replace('Home')
-                // 'Home' é o nome que você deu à rota do Dashboard no RootNavigator
-                navigation.replace('Home'); 
+                navigation.navigate('App'); 
             } else {
                 throw new Error('Resposta de login inválida');
             }
@@ -181,31 +179,7 @@ const Login = () => {
         setPassword('');
         setIsLoading(false);
     };
-    
-    const handleRegister = () => {
-        // **MUDANÇA PARA STACK:** Substitui router.push('/registro') por navigation.navigate('Registro')
-        // 'Registro' é o nome que a tela deve ter na sua stack
-        navigation.navigate('Registro');
-    };
-    
-    const handleForgotPassword = () => {
-        setIsModalVisible(true);
-    };
-    
-    const sendRecoveryEmail = async () => {
-        if (!recoveryEmail) {
-            window.alert('Por favor, insira um email válido.');
-            return;
-        }
-        try {
-            const result = await forgotPassword({ email: recoveryEmail });
-            window.alert(result.message);
-        } catch (err: any) {
-            window.alert(err.message);
-        }
-        setRecoveryEmail('');
-        setIsModalVisible(false);
-    };
+  
 
     {/*Estilos do Componente*/}
     const styles = loginStyles;
@@ -214,36 +188,6 @@ const Login = () => {
     {/*Objeto Retornado*/}
     return (
         <View style={{ height: '100%' }}>
-            {/*Popup de Recuperação de Senha*/}
-            <Modal
-                visible={isModalVisible}
-                animationType="slide"
-                transparent={true}
-                onRequestClose={() => setIsModalVisible(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContainer}>
-                        <Text style={styles.modalTitle}>Recuperar Senha</Text>
-                        <TextInput
-                            value={recoveryEmail}
-                            onChangeText={setRecoveryEmail}
-                            placeholder="Digite seu email"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            style={styles.modalInput}
-                            placeholderTextColor="#a0c4ff"
-                        />
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity onPress={sendRecoveryEmail} style={styles.modalButton}>
-                                <Text style={styles.modalButtonText}>Enviar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setIsModalVisible(false)} style={[styles.modalButton, styles.modalCancelButton]}>
-                                <Text style={styles.modalButtonText}>Cancelar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
 
             {/*Formulário de Login */}
             <ScrollView contentContainerStyle={styles.container}>
