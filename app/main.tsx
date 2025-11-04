@@ -1,23 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useSideBar } from "@/components/contexts/SideBarContext";
-import {
-  View,
-  Text,
-  Platform,
-  Image,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  useWindowDimensions
-} from "react-native";
-import {
-  SideBarMobile,
-  SideBar,
-  ButtonPrimary,
-  ButtonSecundary,
-  Menu,
-  MainContentController,
-} from "@/components/Components";
+import {View,Text,Platform,Image,Pressable,SafeAreaView,ScrollView,useWindowDimensions, Alert} from "react-native";
+import {SideBarMobile,SideBar,ButtonPrimary,ButtonSecundary,Menu,MainContentController} from "@/components/Components";
 import { Colors } from "@/styles/colors";
 import { useFocusEffect, useRouter } from "expo-router";
 import mainStyles from "@/styles/main";
@@ -30,13 +14,13 @@ import { UserDataProvider, UserData } from "@/components/contexts/UserDataContex
 import CarteiraModal from "@/components/CarteiraModal";
 
 const Main = () => {
-  const [selectedMenu, setSelectedMenu] = useState("Main");
   const { toggleSidebar } = useSideBar();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [userBalance, setUserBalance] = useState(0);
   const [carteiraModalVisible, setCarteiraModalVisible] = useState(false);
+  const [qrCodeValue, setQrCodeValue] = useState<string | undefined>(undefined);
   const {width } = useWindowDimensions();
   const isMobile = width < 768; // Exemplo de breakpoint para mobile
 
@@ -51,11 +35,13 @@ const Main = () => {
         if (!data) {
           setIsAuthenticated(false);
         }
+        else if(data.detail === "Token inválido") {
+          setIsAuthenticated(false);
+        }
         else{
           setUserData(data);
           setIsAuthenticated(true);
           
-          // Buscar dados completos do usuário incluindo saldo
           getUserDetails().then((userDetails) => {
             setUserBalance(userDetails.balance_in_cents || 0);
           }).catch((error) => {
@@ -78,25 +64,24 @@ const Main = () => {
 
   const handleDeposit = async (amount: number) => {
     try {
-      await depositMoney(amount);
-      // Atualizar saldo após depósito
-      const userDetails = await getUserDetails();
-      if (userDetails && userDetails.balance_in_cents) {
-        setUserBalance(userDetails.balance_in_cents);
+      const res = await depositMoney(amount);
+      if(res.status === "success"){
+        console.log('QR Code URL:', res.qrcode_url);
+        setQrCodeValue(res.qrcode_url);
       }
-    } catch (error) {
+      else{
+        Alert.alert('Erro', 'Erro ao processar depósito');
+        throw new Error('Erro ao processar depósito');
+      }
+    } 
+    catch (error) {
       throw error;
     }
   };
 
   const handleWithdraw = async (amount: number) => {
     try {
-      await withdrawMoney(amount);
-      // Atualizar saldo após saque
-      const userDetails = await getUserDetails();
-      if (userDetails && userDetails.balance_in_cents) {
-        setUserBalance(userDetails.balance_in_cents);
-      }
+      Alert.alert('Saques com Problema Temporariamente')
     } catch (error) {
       throw error;
     }
@@ -104,7 +89,7 @@ const Main = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-
+    
       {/* container raiz em coluna */}
       <View style={[mainStyles.container, { flex: 1 }]}>
         
@@ -120,7 +105,6 @@ const Main = () => {
                 />
                 <Text
                   style={{
-                    fontFamily: "Segoe UI",
                     fontWeight: "bold",
                     fontSize: 20,
                     color: "#FFDE59",
@@ -138,7 +122,6 @@ const Main = () => {
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <Text
                     style={{
-                      fontFamily: "Segoe UI",
                       fontWeight: "bold",
                       fontSize: 20,
                       color: "#FFDE59",
@@ -220,6 +203,7 @@ const Main = () => {
         onClose={() => setCarteiraModalVisible(false)}
         currentBalance={userBalance}
         onDeposit={handleDeposit}
+        qrCodeUrl={qrCodeValue}
         onWithdraw={handleWithdraw}
       />
             

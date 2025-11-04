@@ -4,7 +4,7 @@ import { useSideBar } from '@/components/contexts/SideBarContext';
 import { useContent } from '@/components/contexts/ContentContext';
 import { Resultados,Jogar,Home} from '@/components/Components';
 import { Target, Dice6, House, User } from 'lucide-react-native';
-import MinhasApostas from './pages/MinhasApostas';
+import MinhasApostas from './pages/MinhasApostas/page';
 
 const screenWidth = Dimensions.get('window').width;
 const targetWidth = screenWidth * 0.2;

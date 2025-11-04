@@ -46,7 +46,7 @@ const Carrossel = ({ items }: { items: BannerProps[] }) => {
             source={
               item.image_url
                 ? { uri: item.image_url }
-                : require('../assets/images/favicon.png')
+                : require('@/assets/images/favicon.png')
             }
             style={{
               width,

@@ -17,8 +17,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
   
   // Formatar saldo (dividir por 100 para converter de centavos para reais)
   const formatBalance = (cents: number) => {
-    const reais = cents;
-    return String(reais).replace('.', ',');
+    const reais = cents / 100;
+    return reais.toFixed(2).replace('.', ',');
   };
 
   return (

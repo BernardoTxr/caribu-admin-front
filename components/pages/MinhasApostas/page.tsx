@@ -1,8 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, ActivityIndicator, Text } from "react-native";
-import MinhaApostaResult from "@/components/MinhaApostaResult";
-import { getUserBets } from "@/app/services/minhas_apostas";
+import BetTable from "@/components/pages/MinhasApostas/MinhaApostaResult";
 import { Colors } from "@/styles/colors";
+
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+
+const getUserBets = async (token: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/bets/my_bets`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      // Pega do backend diretamente
+      const message = errorData.message || errorData.detail || 'Erro desconhecido';
+      throw new Error(message);
+    }
+
+    return await response.json();
+  } catch (err: any) {
+    console.error('Erro na chamada da API:', err);
+    throw err;
+  }
+};
 
 const MinhasApostas: React.FC = () => {
   const [bets, setBets] = useState<any[]>([]);
@@ -14,7 +39,8 @@ const MinhasApostas: React.FC = () => {
       setLoading(true);
       if (token) {
         const data = await getUserBets(token);
-        setBets(data);
+        console.log(data);
+        setBets(data.bets || []);
         setLoading(false);
       }
       
@@ -34,14 +60,10 @@ const MinhasApostas: React.FC = () => {
     <ScrollView style={{ flex: 1, backgroundColor: Colors.branco}} contentContainerStyle={{ padding: 16 }}>
       {bets.length === 0 ? (
         <Text style={{ color: Colors.branco }}>Você ainda não fez apostas.</Text>
-      ) : (
-        bets.map((bet, i) => (
-          <MinhaApostaResult
-            key={i}
-            bet={bet.bet}
-            possible_bet={bet.possible_bet}
+      ) : (       
+          <BetTable
+            bets={bets}
           />
-        ))
       )}
     </ScrollView>
   );

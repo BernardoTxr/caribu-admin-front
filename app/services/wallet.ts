@@ -9,8 +9,7 @@ export interface WithdrawRequest {
 }
 
 export const depositMoney = async (amount_in_cents: number): Promise<any> => {
-  const token = localStorage.getItem('authToken');
-  
+  const token = localStorage.getItem('access_token');
   if (!token) {
     throw new Error('Token de autenticação não encontrado');
   }
@@ -21,8 +20,8 @@ export const depositMoney = async (amount_in_cents: number): Promise<any> => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify({ amount_in_cents }),
-  });
+    body: JSON.stringify({'valor': amount_in_cents}),
+  })
 
   if (!response.ok) {
     const errorData = await response.json();

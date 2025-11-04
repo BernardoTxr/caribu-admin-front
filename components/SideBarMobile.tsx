@@ -3,7 +3,7 @@ import { View, Text, Pressable,Dimensions, Animated } from 'react-native';
 import { useContent } from '@/components/contexts/ContentContext';
 import { Resultados,Jogar,Home} from '@/components/Components';
 import { Target, Dice6, House, User } from 'lucide-react-native';
-import MinhasApostas from './pages/MinhasApostas';
+import MinhasApostas from './pages/MinhasApostas/page';
 import {Colors} from '@/styles/colors';
 
 const screenWidth = Dimensions.get('window').width;

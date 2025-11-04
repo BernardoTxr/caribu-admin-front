@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Animated, Dimensions } from 'react-native';
-import AtrasadoCard from '@/components/AtrasadoCard';
+import AtrasadoCard from '@/components/pages/Home/AtrasadoCard';
 
 const { width } = Dimensions.get('window');
 

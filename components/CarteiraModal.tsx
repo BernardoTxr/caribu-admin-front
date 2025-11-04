@@ -6,8 +6,10 @@ import {
   TouchableOpacity, 
   TextInput, 
   StyleSheet, 
-  Alert 
+  Alert,
+  ScrollView
 } from 'react-native';
+import QRCode from 'react-native-qrcode-svg';
 import { Colors } from '@/styles/colors';
 import { ButtonPrimary, ButtonSecundary } from '@/components/Components';
 
@@ -15,6 +17,7 @@ interface CarteiraModalProps {
   visible: boolean;
   onClose: () => void;
   currentBalance: number;
+  qrCodeUrl?: string; // ✅ URL do QR Code passada via props
   onDeposit: (amount: number) => Promise<void>;
   onWithdraw: (amount: number) => Promise<void>;
 }
@@ -23,20 +26,20 @@ const CarteiraModal: React.FC<CarteiraModalProps> = ({
   visible,
   onClose,
   currentBalance,
+  qrCodeUrl, // ✅ recebendo QR Code
   onDeposit,
   onWithdraw
 }) => {
+
   const [activeTab, setActiveTab] = useState<'depositar' | 'sacar'>('depositar');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
 
   const formatCurrency = (value: number) => {
-    return (value).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
+    const reais = value / 100;
+    return reais.toFixed(2).replace('.', ',');
   };
-
+    
   const parseAmount = (text: string): number => {
     const cleanText = text.replace(/[^\d,]/g, '').replace(',', '.');
     return Math.round(parseFloat(cleanText || '0') * 100);
@@ -44,7 +47,7 @@ const CarteiraModal: React.FC<CarteiraModalProps> = ({
 
   const handleConfirm = async () => {
     const amountInCents = parseAmount(amount);
-    
+
     if (amountInCents <= 0) {
       Alert.alert('Erro', 'Digite um valor válido');
       return;
@@ -59,16 +62,17 @@ const CarteiraModal: React.FC<CarteiraModalProps> = ({
     try {
       if (activeTab === 'depositar') {
         await onDeposit(amountInCents);
-        Alert.alert('Sucesso', 'Depósito realizado com sucesso!');
-      } else {
+        Alert.alert('Depósito iniciado', 'Escaneie o QR Code para pagar');
+      } 
+      else {
         await onWithdraw(amountInCents);
         Alert.alert('Sucesso', 'Saque realizado com sucesso!');
       }
-      setAmount('');
-      onClose();
-    } catch (error) {
+    } 
+    catch (error) {
       Alert.alert('Erro', `Erro ao ${activeTab}: ${error}`);
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };
@@ -81,7 +85,7 @@ const CarteiraModal: React.FC<CarteiraModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.modal}>
+        <ScrollView contentContainerStyle={styles.modal}>
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Carteira</Text>
@@ -93,7 +97,7 @@ const CarteiraModal: React.FC<CarteiraModalProps> = ({
           {/* Saldo atual */}
           <View style={styles.balanceContainer}>
             <Text style={styles.balanceLabel}>Saldo atual:</Text>
-            <Text style={styles.balanceValue}>{formatCurrency(currentBalance)}</Text>
+            <Text style={styles.balanceValue}>R$ {formatCurrency(currentBalance)}</Text>
           </View>
 
           {/* Tabs */}
@@ -159,12 +163,28 @@ const CarteiraModal: React.FC<CarteiraModalProps> = ({
                 size={14}
               />
             </View>
+
+            {/* QR Code */}
+            {qrCodeUrl && (
+              <View style={{ marginTop: 20, alignItems: 'center' }}>
+                <Text style={{ color: Colors.branco, marginBottom: 10 }}>
+                  Escaneie o QR Code para pagar:
+                </Text>
+                <QRCode
+                  value={qrCodeUrl}
+                  size={250}
+                  color="black"
+                  backgroundColor="white"
+                />
+              </View>
+            )}
           </View>
-        </View>
+        </ScrollView>
       </View>
     </Modal>
   );
 };
+
 
 const styles = StyleSheet.create({
   overlay: {

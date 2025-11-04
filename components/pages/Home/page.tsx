@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity,useWindowDimensions,StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, useWindowDimensions, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import homeStyles from '@/styles/home';
-import { Carrossel, FeatureCard, ApostasRecentes } from '@/components/Components';
+import { Carrossel, FeatureCard, ApostasRecentes, AtrasadosRecentes } from '@/components/Components';
 import { Colors } from "@/styles/colors";
-import { useContent } from '@/components/contexts/ContentContext';
-import Resultados from '@/components/pages/Resultados';
-import AtrasadosRecentes from '@/components/AtrasadosRecentes';
 import { Trophy } from 'lucide-react-native';
-import Collapsible from 'react-native-collapsible';
-
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL; 
+interface ImageItem {
+  image_base64: string;
+  href: string;
+  active: boolean;
+  type: string;
+  image_url: string;
+}
 
 
 const Home: React.FC = () => {
-
   const { width } = useWindowDimensions();
   const [cardImages, setCardImages] = useState<{ href: string; image_url: string }[]>([]);
   const [bannerImages, setBannerImages] = useState<{ href: string; image_url: string }[]>([]);
-  const [cotacoes, setCotacoes] = useState<{ nome: string; valor: string }[]>([]);
+  const [loading, setLoading] = useState(true);
   const isMobile = width < 768;
+
   const atrasadosData = [
     { grupo: '4',  animal: 'Borboleta',  tempoAtrasado: 'Há 180 dias', dataUltimaSaida: '02/02 às 08:00' },
     { grupo: '7',  animal: 'Carneiro',   tempoAtrasado: 'Há 175 dias', dataUltimaSaida: '05/02 às 14:00' },
@@ -30,28 +32,49 @@ const Home: React.FC = () => {
   ];
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/images/images`)
-      .then((response) => response.json())
-      .then((data: { image_base64: string; href: string; active: boolean; type: string }[]) => {
-        const formatted = data.map((item) => ({
+    const loadImages = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/images/images`);
+        const data = await response.json();
+
+        const formatted: ImageItem[] = data.map((item: ImageItem) => ({
           active: item.active,
           type: item.type,
           href: item.href,
           image_url: `data:image/jpeg;base64,${item.image_base64}`,
         }));
 
-        const cards = formatted.filter((item) => item.type === "card" && item.active);
-        const banners = formatted.filter((item) => item.type === "banner" && item.active);
+        const cards = formatted.filter(item => item.type === "card" && item.active);
+        const banners = formatted.filter(item => item.type === "banner" && item.active);
 
-        setBannerImages(banners);
+
+        // Pré-carrega todas as imagens
+        await Promise.all([
+          ...cards.map(card => Image.prefetch(card.image_url)),
+          ...banners.map(banner => Image.prefetch(banner.image_url)),
+        ]);
+
         setCardImages(cards);
-      })
-      .catch((error) => {
+        setBannerImages(banners);
+      } catch (error) {
         console.error("Erro ao buscar imagens:", error);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadImages();
   }, []);
 
-  
+  if (loading) {
+    // Mostrar um loader enquanto as imagens carregam
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.azulescuro} />
+        <Text style={{ marginTop: 10, color: Colors.azulescuro }}>Carregando conteúdo...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={homeStyles.container}>
@@ -67,9 +90,7 @@ const Home: React.FC = () => {
           ))}
         </View>
 
-        {/* Resultados Atrasados
-              TODO: Passar estilos para styles
-        */}
+        {/* Resultados Atrasados */}
         <View style={[homeStyles.atrasadosContainer,{display:'flex',flexDirection:'row', gap:0}]}>    
           <View style={{width:'20%', maxWidth:60, backgroundColor:Colors.azulescuro,borderRadius:7,alignItems:'center', justifyContent:'center'}}>
             <Trophy size={40} color={Colors.branco} fill={Colors.branco}/>
@@ -78,26 +99,10 @@ const Home: React.FC = () => {
           <AtrasadosRecentes dados={atrasadosData} />
         </View>
 
-        {/* TODO: Cotações*/}
-        {/*<View style={[homeStyles.atrasadosContainer,{display:'flex',flexDirection:'column', gap:0}]}>  
-          <View style={{display:'flex',flexDirection:'row',alignItems:'center', justifyContent:'space-between',marginBottom:15}}>
-            <Text style={isMobile ? {}:{fontSize:24,fontWeight:'bold',color:Colors.azulescuro}}>A Maior Cotação do Mercado</Text>
-            <TouchableOpacity style={[homeStyles.verTodosButton,{borderColor:Colors.azulescuro,backgroundColor:'rgba(59, 130, 246, 0.2)'}]}> 
-              <Text style={[homeStyles.verTodosText,{color:Colors.azulescuro}]}>Ver todas cotações</Text>
-            </TouchableOpacity>
-          </View>
+        {/* TODO: Cotações */}
 
-          <View>
+        {/* TODO: Dúvidas Frequentes */}
 
-
-          </View>
-        </View>*/}
-
-
-
-        {/*TODO: Dúvidas Frequentes*/}
-
-        
         {/* Apostas Recentes */}
         <View style={homeStyles.atrasadosContainer}>
           <View style={[homeStyles.atrasadosHeader,{marginBottom:15}]}>
@@ -113,25 +118,5 @@ const Home: React.FC = () => {
     </ScrollView>
   );
 };
-
-
-const styles = StyleSheet.create({
-  question: {
-    padding: 10,
-    backgroundColor: '#a0c4ff', // exemplo de cor
-    borderRadius: 5,
-    fontWeight: 'bold',
-  },
-  answerContainer: {
-    padding: 10,
-    backgroundColor: '#caf0f8',
-    borderRadius: 5,
-    marginTop: 5,
-  },
-  answer: {
-    fontSize: 14,
-    color: '#03045e',
-  },
-});
 
 export default Home;
