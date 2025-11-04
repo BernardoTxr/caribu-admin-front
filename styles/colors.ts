@@ -1,0 +1,27 @@
+export const Colors = {
+    azulEscuro: '#1e3a8a',
+    amarelo: '#facc15',
+    azulClaro: '#a0c4ff',
+    branco: '#ffffff',
+    preto: '#000000',
+    brancotransparente: 'rgba(255,255,255,0.1)',
+    amarelotransparente: 'rgba(250, 204, 21, 0.2)',
+    bordaamarelotransparente: 'rgba(250, 204, 21, 0.3)',
+    azulclarotransparente: 'rgba(160, 196, 255, 0.1)',
+    verdeescuro: '#1a4314',
+    verdeclaro: '#4CAF50',
+    vermelho: '#FF0000',
+    azulescuro: '#00144d',
+    amareloClaro: '#FFDE59',
+    amareloPuro: '#FFD700',
+    amareloMuitoClaro: 'rgb(249, 238, 195)',
+    amareloMuitoClaroTransparente: 'rgba(249,238,195,0.1)',
+    azulMedio: 'rgb(56, 84, 163)',
+    overlayEscuro: 'rgba(0,0,0,0.6)',
+    brancoMaisTransparente: 'rgba(255,255,255,0.2)',
+    bordabrancotransparente: 'rgba(255,255,255,0.2)',
+    cinzaClaro: '#aaa',
+    cinzaMuitoClaro: '#f0f0f0',
+    // algumas paginas ficaram zoadas ao trocar o # da cor pelo nome da cor, entao caso vc encontre alguma cor que esteja em #, saiba q eh por isso
+};
+
